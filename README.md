@@ -10,4 +10,6 @@ test_monthly.py - This script is used to test a single station by month and year
 
 utilities.py - This script contains utility functions for working with the dataset, such as loading the data, calculating metrics, and plotting.
 
+decompress.sh - decompress the dataset from .xz tar files
+
 Note that the dataset used by these scripts is not included in this repository and must be obtained separately.
