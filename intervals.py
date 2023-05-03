@@ -24,7 +24,7 @@ for station, group in df.groupby('idStation'):
     # Iterate over the rows in the group, checking for missing hours
     for i in range(1, len(group)):
         # Calculate the expected timestamp for the next measurement
-        expected_timestamp = end + pd.Timedelta(hours=1)
+        expected_timestamp = end + pd.Timedelta(hours=8)
         
         # Get the actual timestamp for the next measurement
         actual_timestamp = group.iloc[i]['timeStamp']
@@ -47,6 +47,8 @@ for station, group in df.groupby('idStation'):
     # Add the intervals for this station to the DataFrame
     intervals = intervals.append(station_intervals, ignore_index=True)
 
+
+
 # Print the resulting all intervals
 print(intervals)
 #count of non overlapping intervals per station
@@ -58,29 +60,31 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import numpy as np
 
-# Create a figure and axis
-fig, ax = plt.subplots()
+fig, axs = plt.subplots(nrows=int(len(intervals['idStation'].unique())/2), ncols=2, figsize=(12,4*len(intervals['idStation'].unique())))
 
-# Plot the intervals
-for station, group in intervals.groupby('idStation'):
+for i, (station, group) in enumerate(intervals.groupby('idStation')):
     # Create a list of the start and end timestamps for each interval
     start_times = group['start'].tolist()
     end_times = group['end'].tolist()
+
+    # Convert the Timedelta objects to numerical values
+    start_values = [(t - start_times[0]).total_seconds() / (24 * 3600) for t in start_times]
+    end_values = [(t - start_times[0]).total_seconds() / (24 * 3600) for t in end_times]
+
+    # Plot the intervals as horizontal bars on the y-axis
+    axs[i//2, i%2].broken_barh([(start_values[j], end_values[j]-start_values[j]) for j in range(len(start_values))], 
+                   (0, 0.5), 
+                   facecolors='blue')
+
+    # Set the x-axis label and title
+    axs[i//2, i%2].set_xlabel('Time (days)')
+    axs[i//2, i%2].set_title(f'Intervals for Station {station}')
+    #remove y axis
+    axs[i//2, i%2].get_yaxis().set_visible(False)
+    #increase hspace
+    fig.subplots_adjust(hspace=0.85)
     
-    # Create a list of the start and end timestamps for the x-axis
-    x = start_times + end_times
-    x.sort()
-    
-    # Create a list of the y-axis values
-    y = [station] * len(x)
-    
-    # Plot the intervals
-    ax.plot(x, y, color='blue')
-    # plot the points
-    ax.plot(start_times, [station] * len(start_times), 'o', color='red')
-    ax.plot(end_times, [station] * len(end_times), 'o', color='green')
-    
-# Set the x-axis limits
-ax.set_xlim([df['timeStamp'].min(), df['timeStamp'].max()])
-#plot
+
+
+# Show the plot
 plt.show()
