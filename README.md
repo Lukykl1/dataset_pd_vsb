@@ -12,4 +12,6 @@ utilities.py - This script contains utility functions for working with the datas
 
 decompress.sh - decompress the dataset from .xz tar files
 
+intervals.py - visualise and print continuous intervals of data acquisition for each station 
+
 Note that the dataset used by these scripts is not included in this repository and must be obtained separately.
